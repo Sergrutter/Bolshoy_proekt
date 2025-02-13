@@ -1,13 +1,18 @@
 import sys
 import requests
 from PyQt6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QWidget
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QKeyEvent
 
 api = "https://static-maps.yandex.ru/1.x/"
 
 class MapViewer(QWidget):
     def __init__(self):
         super().__init__()
+        
+        self.min_zo = 1
+        self.max_zo = 17
+        self.zo_tek = 10
+
         self.setWindowTitle("1 часть большого проекта")
         self.setGeometry(100, 100, 650, 500)
 
@@ -45,6 +50,18 @@ class MapViewer(QWidget):
             file.write(response.content)
         pixmap = QPixmap("map.png")
         self.map_label.setPixmap(pixmap)
+
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == 16777238:
+            if self.zo_tek < self.max_zo:
+                self.zo_tek += 1
+                self.zo.setText(str(self.zo_tek))
+                self.load_map()
+        elif event.key() == 16777239:
+            if self.zo_tek > self.min_zo:
+                self.zo_tek -= 1
+                self.zo.setText(str(self.zo_tek))
+                self.load_map()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
