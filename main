@@ -1,0 +1,53 @@
+import sys
+import requests
+from PyQt6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QWidget
+from PyQt6.QtGui import QPixmap
+
+api = "https://static-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b"
+
+class MapViewer(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("1 часть большого проекта")
+        self.setGeometry(100, 100, 650, 500)
+
+        self.lat = QLineEdit(self)
+        self.lat.setGeometry(20, 20, 200, 30)
+
+        self.lon = QLineEdit(self)
+        self.lon.setGeometry(20, 60, 200, 30)
+
+        self.zo = QLineEdit(self)
+        self.zo.setGeometry(20, 100, 200, 30)
+
+        self.btn = QPushButton("Показать карту", self)
+        self.btn.setGeometry(20, 140, 200, 40)
+        self.btn.clicked.connect(self.load_map)
+
+        self.map_label = QLabel(self)
+        self.map_label.setGeometry(250, 20, 370, 370)
+
+    def load_map(self):
+        lat = self.lat.text().strip()
+        lon = self.lon.text().strip()
+        zoom = self.zo.text().strip()
+
+        params = {
+            "ll": f"{lon},{lat}",
+            "z": zoom,
+            "l": "map",
+            "size": "400,400"
+        }
+
+        response = requests.get(api, params=params)
+
+        with open("map.png", "wb") as file:
+            file.write(response.content)
+        pixmap = QPixmap("map.png")
+        self.map_label.setPixmap(pixmap)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    ex = MapViewer()
+    ex.show()
+    sys.exit(app.exec())
